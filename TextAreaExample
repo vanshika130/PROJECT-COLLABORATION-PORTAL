@@ -1,0 +1,669 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+
+public class TextAreaExample {
+
+    // Constructor to set up the main frame and home page
+    TextAreaExample() {
+        // Create a new JFrame with the title
+        JFrame f = new JFrame("Project Collaboration Hub");
+
+        // Set the size of the JFrame (e.g., 1024x768)
+        f.setSize(1024, 768);
+
+        // Create a custom JPanel to hold the components and set a background image
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                ImageIcon backgroundImage = new ImageIcon("/Users/yashsrivastava32/Desktop/VA.jpg"); // Use your specified image path
+                g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+            }
+        };
+
+        // Set layout for the panel
+        panel.setLayout(null);
+
+        // Main heading: "Empowering Teams: Project Collaboration Hub"
+        JLabel mainHeading = new JLabel("Empowering Teams: Project Collaboration Hub", JLabel.CENTER);
+        mainHeading.setFont(new Font("Arial", Font.BOLD, 40)); // Set font size to 40 and bold
+        mainHeading.setForeground(Color.BLUE); // Set color of the main heading to blue
+        mainHeading.setBounds(50, 50, f.getWidth() - 100, 100); // Center and set height
+
+        // Subheading 1: "Welcome to the Collaboration Hub"
+        JLabel subHeading1 = new JLabel("Welcome to the Collaboration Hub", JLabel.CENTER);
+        subHeading1.setFont(new Font("Arial", Font.PLAIN, 35)); // Set font size to 35
+        subHeading1.setBounds(50, 150, f.getWidth() - 100, 50); // Position below the main heading
+
+        // Subheading 2: "Get Started"
+        JLabel subHeading2 = new JLabel("GET STARTED", JLabel.CENTER);
+        subHeading2.setFont(new Font("Arial", Font.PLAIN, 20)); // Set font size to 20
+        subHeading2.setBounds(50, 250, f.getWidth() - 100, 50);
+
+        // Create Sign In button
+        JButton signInButton = new JButton("Sign In");
+        signInButton.setForeground(Color.BLUE);
+        signInButton.setBackground(Color.LIGHT_GRAY); // Set button color to light gray
+        signInButton.setBounds(350, 400, 150, 50);
+
+        // Create Sign Up button
+        JButton signUpButton = new JButton("Sign Up");
+        signUpButton.setForeground(Color.BLUE);
+        signUpButton.setBackground(Color.LIGHT_GRAY); // Set button color to light gray
+        signUpButton.setBounds(550, 400, 150, 50);
+
+        // Add action listener to open the Sign In form
+        signInButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openSignInFrame();
+            }
+        });
+
+        // Add action listener to open the Sign Up form
+        signUpButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openSignUpFrame();
+            }
+        });
+
+        // Add the main heading, subheadings, and buttons to the panel
+        panel.add(mainHeading);
+        panel.add(subHeading1);
+        panel.add(subHeading2);
+        panel.add(signInButton);
+        panel.add(signUpButton);
+
+        // Add the panel to the frame
+        f.add(panel);
+
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.setVisible(true);
+    }
+
+    // Method to open the Sign In JFrame with validation
+    private void openSignInFrame() {
+        JFrame signInFrame = new JFrame("Sign In");
+        signInFrame.setSize(400, 300);
+        signInFrame.setLayout(new GridLayout(3, 2));
+
+        // Username label and field
+        JLabel usernameLabel = new JLabel("Username:");
+        JTextField usernameField = new JTextField();
+
+        // Password label and field
+        JLabel passwordLabel = new JLabel("Password:");
+        JPasswordField passwordField = new JPasswordField();
+
+        // Sign In button with validation
+        JButton signIn = new JButton("Sign In");
+        signIn.setForeground(Color.BLUE);
+        signIn.setBackground(Color.LIGHT_GRAY); // Set button color to light gray
+        signIn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText().trim();
+                String password = new String(passwordField.getPassword());
+
+                // Validation for username and password
+                if (username.isEmpty()) {
+                    JOptionPane.showMessageDialog(signInFrame, "Username cannot be empty.");
+                    return;
+                }
+
+                if (password.isEmpty()) {
+                    JOptionPane.showMessageDialog(signInFrame, "Password cannot be empty.");
+                    return;
+                }
+
+                // Open home page on successful sign-in
+                openHomePage(username);
+                signInFrame.dispose(); // Close sign-in frame
+            }
+        });
+
+        // Add components to the Sign In frame
+        signInFrame.add(usernameLabel);
+        signInFrame.add(usernameField);
+        signInFrame.add(passwordLabel);
+        signInFrame.add(passwordField);
+        signInFrame.add(signIn);
+
+        signInFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        signInFrame.setVisible(true);
+    }
+
+    // Method to open the Sign Up JFrame with validation
+    public void openSignUpFrame() {
+        JFrame signUpFrame = new JFrame("Sign Up");
+        signUpFrame.setSize(400, 600);
+        signUpFrame.setLayout(new GridLayout(14, 2)); // Adjusted for additional fields
+
+        // Labels and input fields
+        JLabel usernameLabel = new JLabel("Username:");
+        JTextField usernameField = new JTextField();
+
+        JLabel passwordLabel = new JLabel("Password:");
+        JPasswordField passwordField = new JPasswordField();
+
+        JLabel contactNumberLabel = new JLabel("Contact Number:");
+        JTextField contactNumberField = new JTextField();
+
+        JLabel collegeNameLabel = new JLabel("College Name:");
+        JTextField collegeNameField = new JTextField();
+
+        JLabel cgpaLabel = new JLabel("CGPA:");
+        JTextField cgpaField = new JTextField();
+
+        JLabel yearLabel = new JLabel("Year:");
+        JTextField yearField = new JTextField();
+
+        JLabel degreeLabel = new JLabel("Educational Degree:");
+        JTextField degreeField = new JTextField();
+
+        JLabel ageLabel = new JLabel("Select Age:");
+        JSpinner ageSpinner = new JSpinner(new SpinnerNumberModel(18, 1, 100, 1)); // Age spinner
+
+        JLabel linkedinLabel = new JLabel("LinkedIn URL:");
+        JTextField linkedinField = new JTextField();
+
+        JLabel sopLabel = new JLabel("Statement of Purpose (max 200 words):");
+        JTextArea sopArea = new JTextArea(5, 20); // 5 rows, 20 columns
+        sopArea.setLineWrap(true);
+        sopArea.setWrapStyleWord(true);
+
+        JLabel resumeLabel = new JLabel("Upload Resume:");
+        JButton uploadResumeButton = new JButton("Upload");
+        uploadResumeButton.addActionListener(e -> uploadFile("Select Resume"));
+
+        // Sign Up button with validation
+        JButton signUp = new JButton("Sign Up");
+        signUp.setForeground(Color.BLUE);
+        signUp.setBackground(Color.LIGHT_GRAY); // Set button color to light gray
+        signUp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Collect input data
+                String username = usernameField.getText().trim();
+                String password = new String(passwordField.getPassword());
+                String contactNumber = contactNumberField.getText().trim();
+                String linkedin = linkedinField.getText().trim();
+                int age = (int) ageSpinner.getValue(); // Get selected age
+                String sopText = sopArea.getText().trim();
+
+                // Validation for mandatory fields
+                if (username.isEmpty()) {
+                    JOptionPane.showMessageDialog(signUpFrame, "Username cannot be empty.");
+                    return;
+                }
+
+                if (password.isEmpty()) {
+                    JOptionPane.showMessageDialog(signUpFrame, "Password cannot be empty.");
+                    return;
+                }
+
+                if (contactNumber.isEmpty() || !contactNumber.matches("\\d{10}")) {
+                    JOptionPane.showMessageDialog(signUpFrame, "Contact Number must be exactly 10 digits.");
+                    return;
+                }
+
+                if (linkedin.isEmpty() || !isValidURL(linkedin)) {
+                    JOptionPane.showMessageDialog(signUpFrame, "Please enter a valid LinkedIn URL.");
+                    return;
+                }
+
+                if (sopText.isEmpty() || sopText.split("\\s+").length > 200) {
+                    JOptionPane.showMessageDialog(signUpFrame, "Please enter a valid Statement of Purpose (max 200 words).");
+                    return;
+                }
+
+                if (age < 1 || age > 100) {
+                    JOptionPane.showMessageDialog(signUpFrame, "Please select a valid age.");
+                    return;
+                }
+
+                // Insert user data into the database
+                saveUserDataToDatabase(username, password, contactNumber, linkedin, age, sopText);
+
+                // Open home page on successful sign-up
+                openHomePage(username);
+                signUpFrame.dispose(); // Close sign-up frame
+            }
+        });
+
+        // Add components to the sign-up frame
+        signUpFrame.add(usernameLabel);
+        signUpFrame.add(usernameField);
+        signUpFrame.add(passwordLabel);
+        signUpFrame.add(passwordField);
+        signUpFrame.add(contactNumberLabel);
+        signUpFrame.add(contactNumberField);
+        signUpFrame.add(collegeNameLabel);
+        signUpFrame.add(collegeNameField);
+        signUpFrame.add(cgpaLabel);
+        signUpFrame.add(cgpaField);
+        signUpFrame.add(yearLabel);
+        signUpFrame.add(yearField);
+        signUpFrame.add(degreeLabel);
+        signUpFrame.add(degreeField);
+        signUpFrame.add(ageLabel);
+        signUpFrame.add(ageSpinner);
+        signUpFrame.add(linkedinLabel);
+        signUpFrame.add(linkedinField);
+        signUpFrame.add(sopLabel);
+        signUpFrame.add(new JScrollPane(sopArea)); // Add SOP text area inside a scroll pane
+        signUpFrame.add(resumeLabel);
+        signUpFrame.add(uploadResumeButton);
+        signUpFrame.add(signUp);
+
+        signUpFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        signUpFrame.setVisible(true);
+    }
+
+    // Helper method to validate URLs (LinkedIn in this case)
+    private boolean isValidURL(String url) {
+        return url.startsWith("http://") || url.startsWith("https://");
+    }
+
+    // Helper method to upload files (e.g., resume)
+    private void uploadFile(String fileType) {
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            JOptionPane.showMessageDialog(null, fileType + " uploaded: " + selectedFile.getName());
+        }
+    }
+
+    // Save user data into the database (dummy connection)
+    private void saveUserDataToDatabase(String username, String password, String contactNumber, String linkedin, int age, String sopText) {
+        String jdbcURL = "jdbc:mysql://localhost:3306/details";
+        String jdbcUsername = "root";
+        String jdbcPassword = "password";
+
+        try (Connection connection = DriverManager.getConnection(jdbcURL, jdbcUsername, jdbcPassword)) {
+            String query = "INSERT INTO users (username, password, contact_number, linkedin, age, sop_text) VALUES (?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setString(1, username);
+                preparedStatement.setString(2, password);
+                preparedStatement.setString(3, contactNumber);
+                preparedStatement.setString(4, linkedin);
+                preparedStatement.setInt(5, age);
+                preparedStatement.setString(6, sopText);
+                preparedStatement.executeUpdate();
+                JOptionPane.showMessageDialog(null, "User signed up successfully!");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to connect to the database.");
+        }
+    }
+
+
+
+
+    // Method to open the home page with specific buttons and content
+    private void openHomePage(String username) {
+        JFrame homeFrame = new JFrame("Home Page");
+        homeFrame.setSize(1024, 768);
+        homeFrame.setLayout(new BorderLayout());
+
+        // Left panel for buttons
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new GridLayout(8, 1)); // 8 buttons for now
+
+        // Create buttons for Community, Projects, CodeQuest, People, Contact, Settings
+        String[] buttonNames = {"Community", "Projects", "CodeQuest", "People", "Contact", "Settings"};
+        for (String name : buttonNames) {
+            JButton button = new JButton(name);
+            button.setForeground(Color.BLUE);
+            button.setBackground(Color.LIGHT_GRAY); // Set button color to light gray
+            button.addActionListener(e -> {
+                if (name.equals("CodeQuest")) {
+                    openCodeQuestPage();
+                } else if (name.equals("Contact")) {
+                    showContactInfo(homeFrame, username);
+                } else if (name.equals("Settings")) {
+                    showSettingsPage(homeFrame, username);
+                } else if (name.equals("People")) {
+                    new PeoplePage().showPeopleInfo(); // Open People page when button is clicked
+                } else {
+                    showContent(homeFrame, "Welcome to " + name + " section, " + username + "!");
+                }
+            });
+            leftPanel.add(button);
+        }
+
+        // Create JTextArea for default home message
+        JTextArea contentArea = new JTextArea();
+        contentArea.setText("Welcome to Project Collaboration Hub, " + username + "!");
+        contentArea.setFont(new Font("Arial", Font.BOLD, 30)); // Font size 30 and bold
+        contentArea.setLineWrap(true);
+        contentArea.setWrapStyleWord(true);
+        contentArea.setEditable(false);
+
+        // ScrollPane for content area
+        JScrollPane scrollPane = new JScrollPane(contentArea);
+
+        // Add left panel and scroll pane to home frame
+        homeFrame.add(leftPanel, BorderLayout.WEST);
+        homeFrame.add(scrollPane, BorderLayout.CENTER);
+
+        homeFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        homeFrame.setVisible(true);
+    }
+
+
+    private void showContactInfo(JFrame parentFrame, String username) {
+        JFrame contactFrame = new JFrame("Contact Information");
+        contactFrame.setSize(400, 300);
+        contactFrame.setLayout(new BorderLayout());
+
+        // JTextArea for contact details
+        JTextArea contactArea = new JTextArea();
+        contactArea.setText("Contact Information:\n\nEmail: support@example.com\nPhone: +1234567890\nAddress: 123 Project St, Collaboration City");
+        contactArea.setFont(new Font("Arial", Font.PLAIN, 16)); // Font for contact details
+        contactArea.setEditable(false);
+
+        // Centering the contact information
+        contactArea.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contactArea.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        // ScrollPane for contact details
+        JScrollPane contactScrollPane = new JScrollPane(contactArea);
+
+        // Add scroll pane to contact frame
+        contactFrame.add(contactScrollPane, BorderLayout.CENTER);
+
+        contactFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        contactFrame.setVisible(true);
+    }
+
+    private void showSettingsPage(JFrame parentFrame, String username) {
+        JFrame settingsFrame = new JFrame("Settings");
+        settingsFrame.setSize(400, 400);
+        settingsFrame.setLayout(new BorderLayout());
+
+        JPanel settingsPanel = new JPanel();
+        settingsPanel.setLayout(new GridLayout(5, 1, 10, 10)); // 5 rows for settings options
+
+        // Buttons for settings options
+        JButton changePasswordButton = new JButton("Change Password");
+        JButton updateProfileButton = new JButton("Update Profile");
+        JButton notificationButton = new JButton("Notification Settings");
+        JButton logoutButton = new JButton("Logout");
+
+        // Add action listeners to settings buttons
+        changePasswordButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(settingsFrame, "Change Password functionality not implemented yet.");
+        });
+        updateProfileButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(settingsFrame, "Update Profile functionality not implemented yet.");
+        });
+        notificationButton.addActionListener(e -> {
+            JOptionPane.showMessageDialog(settingsFrame, "Notification Settings functionality not implemented yet.");
+        });
+        logoutButton.addActionListener(e -> {
+            // Handle logout logic here
+            JOptionPane.showMessageDialog(settingsFrame, "You have logged out successfully!");
+            settingsFrame.dispose(); // Close settings frame
+        });
+
+        // Add buttons to settings panel
+        settingsPanel.add(changePasswordButton);
+        settingsPanel.add(updateProfileButton);
+        settingsPanel.add(notificationButton);
+        settingsPanel.add(logoutButton);
+
+        // Add settings panel to settings frame
+        settingsFrame.add(settingsPanel, BorderLayout.CENTER);
+
+        settingsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        settingsFrame.setVisible(true);
+    }
+
+    // Method to update content for different sections dynamically
+    private void showContent(JFrame frame, String message) {
+        JTextArea contentArea = new JTextArea();
+        contentArea.setText(message);
+        contentArea.setFont(new Font("Arial", Font.BOLD, 30)); // Font size 30 and bold
+        contentArea.setLineWrap(true);
+        contentArea.setWrapStyleWord(true);
+        contentArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(contentArea);
+        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.revalidate();
+    }
+
+    // Method to open the CodeQuest page
+    private void openCodeQuestPage() {
+        JFrame codeQuestFrame = new JFrame("CodeQuest");
+        codeQuestFrame.setSize(1024, 768);
+        codeQuestFrame.setLayout(new GridLayout(8, 1)); // 8 rows, 1 column to place panels in sequence
+
+        // Main heading: CodeQuest
+        JLabel heading = new JLabel("CODE QUEST", JLabel.CENTER);
+        heading.setFont(new Font("Arial", Font.BOLD, 35)); // Main heading
+        heading.setBorder(BorderFactory.createEmptyBorder(50, 0, 0, 0)); // Remove any borders
+        codeQuestFrame.add(heading);
+
+        // Subheading: Select Language and Difficulty Level
+        JLabel subHeading1 = new JLabel("Select Language and Difficulty Level", JLabel.CENTER);
+        subHeading1.setFont(new Font("Arial", Font.PLAIN, 15)); // Set font size to 15
+        subHeading1.setBorder(BorderFactory.createEmptyBorder(0, 0, 50, 0)); // Remove any borders
+        codeQuestFrame.add(subHeading1);
+
+        // Subheading DSA in C++
+        JPanel dsaCppPanel = new JPanel(new FlowLayout());
+        JLabel dsaCppLabel = new JLabel("DSA in C++:");
+        JButton easydsaCppButton = new JButton("Easy");
+
+        easydsaCppButton.addActionListener(new ActionListener() {
+                                               @Override
+                                               public void actionPerformed(ActionEvent e) {
+                                                   new dsaeasycpp();
+                                               }
+                                           });
+
+
+        JButton mediumdsaCppButton = new JButton("Medium");
+
+        mediumdsaCppButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new DSAQuizAppMedium();
+            }
+        });
+
+        JButton harddsaCppButton = new JButton("Hard");
+
+        harddsaCppButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new DSAQuizApp();
+            }
+        });
+        dsaCppPanel.add(dsaCppLabel);
+        dsaCppPanel.add(easydsaCppButton);
+        dsaCppPanel.add(mediumdsaCppButton);
+        dsaCppPanel.add(harddsaCppButton);
+        codeQuestFrame.add(dsaCppPanel); // Add the C++ panel in sequence
+
+        // Subheading DSA in Java
+        JPanel dsaJavaPanel = new JPanel(new FlowLayout());
+        JLabel dsaJavaLabel = new JLabel("DSA in Java:");
+        JButton easydsaJavaButton = new JButton("Easy");
+        easydsaJavaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new DSAQuizjava1();
+            }
+        });
+
+        JButton mediumdsaJavaButton = new JButton("Medium");
+        mediumdsaJavaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new dsajava2();
+            }
+        });
+
+        JButton harddsaJavaButton = new JButton("Hard");
+        harddsaJavaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new dsajavahard();
+            }
+        });
+        dsaJavaPanel.add(dsaJavaLabel);
+        dsaJavaPanel.add(easydsaJavaButton);
+        dsaJavaPanel.add(mediumdsaJavaButton);
+        dsaJavaPanel.add(harddsaJavaButton);
+        codeQuestFrame.add(dsaJavaPanel); // Add the Java panel in sequence
+
+        // Subheading DSA in Python
+        JPanel dsaPythonPanel = new JPanel(new FlowLayout());
+        JLabel dsaPythonLabel = new JLabel("DSA in Python:");
+        JButton easydsaPythonButton = new JButton("Easy");
+        easydsaPythonButton.addActionListener(new ActionListener() {
+                                                  @Override
+                                                  public void actionPerformed(ActionEvent e) {
+                                                      new dsapython1();
+                                                  }
+                                              });
+        JButton mediumdsaPythonButton = new JButton("Medium");
+        mediumdsaPythonButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new dsapython2();
+            }
+        });
+        JButton harddsaPythonButton = new JButton("Hard");
+        harddsaPythonButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new dsapython3();
+            }
+        });
+        dsaPythonPanel.add(dsaPythonLabel);
+        dsaPythonPanel.add(easydsaPythonButton);
+        dsaPythonPanel.add(mediumdsaPythonButton);
+        dsaPythonPanel.add(harddsaPythonButton);
+        codeQuestFrame.add(dsaPythonPanel); // Add the Python DSA panel in sequence
+
+        // Subheading Python (Non-DSA)
+        JPanel pythonPanel = new JPanel(new FlowLayout());
+        JLabel pythonLabel = new JLabel("Python:");
+        JButton easyPythonButton = new JButton("Easy");
+        easyPythonButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new python1();
+            }
+        });
+
+        JButton mediumPythonButton = new JButton("Medium");
+        mediumPythonButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new python2();
+            }
+        });
+        JButton hardPythonButton = new JButton("Hard");
+        hardPythonButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new python3();
+            }
+        });
+        pythonPanel.add(pythonLabel);
+        pythonPanel.add(easyPythonButton);
+        pythonPanel.add(mediumPythonButton);
+        pythonPanel.add(hardPythonButton);
+        codeQuestFrame.add(pythonPanel); // Add the non-DSA Python panel in sequence
+
+        // Subheading Java (Non-DSA)
+        JPanel JavaPanel = new JPanel(new FlowLayout());
+        JLabel JavaLabel = new JLabel("Java:");
+        JButton easyJavaButton = new JButton("Easy");
+        easyJavaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new java1();
+            }
+        });
+
+        JButton mediumJavaButton = new JButton("Medium");
+        mediumJavaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new java2();
+            }
+        });
+
+        JButton hardJavaButton = new JButton("Hard");
+        hardJavaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new java3();
+            }
+        });
+        JavaPanel.add(JavaLabel);
+        JavaPanel.add(easyJavaButton);
+        JavaPanel.add(mediumJavaButton);
+        JavaPanel.add(hardJavaButton);
+        codeQuestFrame.add(JavaPanel); // Add the non-DSA Java panel in sequence
+
+        // Subheading C (Non-DSA)
+        JPanel cppPanel = new JPanel(new FlowLayout());
+        JLabel cppLabel = new JLabel("C++:");
+        JButton easycppButton = new JButton("Easy");
+        easycppButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new cpp1();
+            }
+        });
+
+
+        JButton mediumcppButton = new JButton("Medium");
+        mediumcppButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new cpp2();
+            }
+        });
+        JButton hardcppButton = new JButton("Hard");
+        hardcppButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new cpp3();
+            }
+        });
+
+        cppPanel.add(cppLabel);
+        cppPanel.add(easycppButton);
+        cppPanel.add(mediumcppButton);
+        cppPanel.add(hardcppButton);
+        codeQuestFrame.add(cppPanel); // Add the non-DSA C panel in sequence
+
+        // Final setup for the JFrame
+        codeQuestFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        codeQuestFrame.setVisible(true);
+    }
+
+
+    // Main method to run the program
+    public static void main(String[] args) {
+        new TextAreaExample();
+    }
+}
